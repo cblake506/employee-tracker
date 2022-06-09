@@ -42,8 +42,6 @@ inquirer
                 message: "Enter employee's Last name",
             }]).then((answers) => {
                 db.query(`INSERT INTO employee(first_name, last_name) VALUES ("${answers.first_name}", "${answers.last_name}");`);
-                // console.log("updated db:\n");
-                // db.query(`USE employee_db;`);
                 db.query(`SELECT * FROM employee;`, (err, res) => {
                     console.log("list of employees:");
                     console.table(res)
