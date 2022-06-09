@@ -31,3 +31,6 @@ CREATE TABLE employee (
     REFERENCES role(id)
     ON DELETE SET NULL
 );
+
+INSERT INTO department(name) VALUES ("HR");
+INSERT INTO employee(first_name, last_name) VALUES ("John", "Smith");
