@@ -40,6 +40,7 @@ const init = () => {
             return inquireAddEmployee();
             break;
           case 'Add Role':
+            getDepartmentsRoles();
             inquireAddRole();
             break;
           case 'Add Department':
@@ -110,12 +111,13 @@ const inquireAddRole = () => {
               message: 'What is the salary for the role?'
           },
           {
-              type: 'input',
-              name: 'departmentId',
-              message: 'What is the department id?'
+              type: "list",
+              message: "Choose the department",
+              choices: departmentNames,
+              name: "deptName"
           }])
           .then((answer => {
-              db.query(`INSERT INTO employee_role (title, salary, department_id) VALUES ("${answer.newRole}", ${answer.salary}, ${answer.departmentId});`, (err, res) => {
+              db.query(`INSERT INTO employee_role (title, salary, department_id) VALUES ("${answer.newRole}", ${answer.salary}, ${departmentsIndexed[answer.deptName]});`, (err, res) => {
                   console.log('Added new role');
                   return init()
               })
@@ -142,8 +144,14 @@ const inquireAddDept = () => {
 
 var departmentsIndexed = {};
 var departmentNames = [];
+var rolesIndexed = {};
+var roleNames = [];
 
 const getDepartmentsRoles = () => {
+  departmentsIndexed = {};
+  departmentNames = [];
+  rolesIndexed = {};
+  roleNames = [];
   db.query(`SELECT * FROM department;`, (err, res) => {
     if (err) { console.log(err) }
     for (let i = 0; i < res.length; i++) {
@@ -151,29 +159,41 @@ const getDepartmentsRoles = () => {
         departmentNames.push(res[i].name);
     }
 })
+  db.query(`SELECT * FROM employee_role;`, (err, res) => {
+    if (err) { console.log(err) }
+    for (let i = 0; i < res.length; i++) {
+      rolesIndexed[res[i].title] = res[i].department_id;
+      roleNames.push(res[i].title);
+    }
+  })
 }
 
 
 const inquireAddEmployee = () => {
     return inquirer.prompt([{
         type: "input",
-        name: "first_name",
+        name: "first",
         message: "Enter employee's first name",
             
     },
     {
         type: "input",
-        name: "last_name",
+        name: "last",
         message: "Enter employee's Last name",
     },
     {
+      type: "input",
+          message: "enter the manager id",
+          name: "managerId"
+    },
+    {
       type: "list",
-          message: "Choose the department",
-          choices: departmentNames,
-          name: "dept"
+          message: "Choose the role",
+          choices: roleNames,
+          name: "roleName"
     }])
-    .then(({answers}) => {
-      console.log(answers)
+    .then((answers) => {
+      db.query(`INSERT INTO employee(first_name, last_name, manager_id, employee_role_id) VALUES ("${answers.first}", "${answers.last}", ${answers.managerId}, ${rolesIndexed[answers.roleName]});`);
     }
   )
 
