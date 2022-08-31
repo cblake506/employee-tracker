@@ -1,9 +1,4 @@
 # employee-tracker
-A command line interface designed using npm inquirer, console.table, mysql2, and dotenv. Allows a user to add an employee to a mysql database.
+A command line interface designed using npm inquirer, console.table, mysql2, and dotenv. Allows a user to add an employee to a mysql database, add a role, add a department, or view each of those three. Prompts a user with a list of departments and roles in whenever attempting to add an entry which requires a role or a department.
 
-## Example Screenshots
-### Main Menu:
-![An image of the application in use.](./assets/ExampleImage.png)
-
-### After adding an employee:
-![An second image of the application in use.](./assets/ExampleImage2.png)
+Requires a .env file to be created with values for DB_NAME, DB_PASSWORD, and DB_USER variables before being run. Afterwards run the schema.sql file found at /db/schema.sql in your mysql terminal to initialize and seed the database. Then type node index.js in the root directory after installing the required npm packages.
