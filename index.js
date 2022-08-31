@@ -25,6 +25,7 @@ const init = () => {
           message: "Choose what you would like to do",
           choices: [
               "Add Employee",
+              "Add Role",
               "View Departments",
               "View Employees",
               "View Roles",
@@ -34,10 +35,13 @@ const init = () => {
     })
     .then(({answers}) => {
       switch(answers){
-          case "Add Employee":
-            return inquireAddEmployee(db);
+          case 'Add Employee':
+            return inquireAddEmployee();
             break;
-          case "View Employees":
+          case 'Add Role':
+            inquireAddRole();
+            break;
+          case 'View Employees':
             db.query(`SELECT * FROM employee;`, (err, res) => {
               console.log("\nList of employees:");
               const table = cTable.getTable(res)
@@ -45,7 +49,7 @@ const init = () => {
               return init();
             })
             break;
-          case "View Departments":
+          case 'View Departments':
             db.query(`SELECT * FROM department;`, (err, res) => {
               console.log("\nList of departments:");
               const table = cTable.getTable(res)
@@ -53,8 +57,8 @@ const init = () => {
               return init();
             })
             break;
-          case "View Roles":
-            db.query(`SELECT * FROM role;`, (err, res) => {
+          case 'View Roles':
+            db.query(`SELECT * FROM employee_role;`, (err, res) => {
               console.log("\nList of roles:");
               const table = cTable.getTable(res)
               console.log(table);
@@ -85,3 +89,32 @@ const init = () => {
 }
 
 init();
+
+
+
+const inquireAddRole = () => {
+  inquirer.prompt(
+      [
+          {
+              type: 'input',
+              name: 'newRole',
+              message: 'What is the role called?'
+          },
+          {
+              type: 'input',
+              name: 'salary',
+              message: 'What is the salary for the role?'
+          },
+          {
+              type: 'input',
+              name: 'departmentId',
+              message: 'What is the department id?'
+          }])
+          .then((answer => {
+              db.query(`INSERT INTO employee_role (title, salary, department_id) VALUES ("${answer.newRole}", ${answer.salary}, ${answer.departmentId});`, (err, res) => {
+                  console.log('Added new role');
+                  return init()
+              })
+          }))
+}
+
