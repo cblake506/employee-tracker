@@ -2,7 +2,6 @@ require('dotenv').config();
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
-const { inquireAddEmployee, viewAllEmployees, viewAllDepartments, viewAllRoles } = require('./lib/employeeQuestions');
 
 // Connect to database
 const db = mysql.createConnection(
@@ -26,6 +25,7 @@ const init = () => {
           choices: [
               "Add Employee",
               "Add Role",
+              "Add Department",
               "View Departments",
               "View Employees",
               "View Roles",
@@ -36,10 +36,14 @@ const init = () => {
     .then(({answers}) => {
       switch(answers){
           case 'Add Employee':
+            getDepartmentsRoles();
             return inquireAddEmployee();
             break;
           case 'Add Role':
             inquireAddRole();
+            break;
+          case 'Add Department':
+            inquireAddDept();
             break;
           case 'View Employees':
             db.query(`SELECT * FROM employee;`, (err, res) => {
@@ -117,4 +121,61 @@ const inquireAddRole = () => {
               })
           }))
 }
+
+
+const inquireAddDept = () => {
+  inquirer.prompt(
+      [
+          {
+              type: 'input',
+              name: 'name',
+              message: 'What is the department called?'
+          }
+          ])
+          .then((answer => {
+              db.query(`INSERT INTO department(name) VALUES ("${answer.name}");`, (err, res) => {
+                  console.log('Added new department');
+                  return init()
+              })
+          }))
+}
+
+var departmentsIndexed = {};
+var departmentNames = [];
+
+const getDepartmentsRoles = () => {
+  db.query(`SELECT * FROM department;`, (err, res) => {
+    if (err) { console.log(err) }
+    for (let i = 0; i < res.length; i++) {
+        departmentsIndexed[res[i].name] = res[i].id;
+        departmentNames.push(res[i].name);
+    }
+})
+}
+
+
+const inquireAddEmployee = () => {
+    return inquirer.prompt([{
+        type: "input",
+        name: "first_name",
+        message: "Enter employee's first name",
+            
+    },
+    {
+        type: "input",
+        name: "last_name",
+        message: "Enter employee's Last name",
+    },
+    {
+      type: "list",
+          message: "Choose the department",
+          choices: departmentNames,
+          name: "dept"
+    }])
+    .then(({answers}) => {
+      console.log(answers)
+    }
+  )
+
+  }
 
