@@ -162,7 +162,7 @@ const getDepartmentsRoles = () => {
   db.query(`SELECT * FROM employee_role;`, (err, res) => {
     if (err) { console.log(err) }
     for (let i = 0; i < res.length; i++) {
-      rolesIndexed[res[i].title] = res[i].department_id;
+      rolesIndexed[res[i].title] = res[i].id;
       roleNames.push(res[i].title);
     }
   })
@@ -194,6 +194,7 @@ const inquireAddEmployee = () => {
     }])
     .then((answers) => {
       db.query(`INSERT INTO employee(first_name, last_name, manager_id, employee_role_id) VALUES ("${answers.first}", "${answers.last}", ${answers.managerId}, ${rolesIndexed[answers.roleName]});`);
+      return init();
     }
   )
 
